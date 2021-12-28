@@ -1,8 +1,4 @@
 const mongoose = require("mongoose");
-const config = require("../utils/config");
-
-const mongoUrl = config.MONGODB_URI;
-console.log(`Connecting to ${mongoUrl}`);
 
 const blogSchema = new mongoose.Schema({
   title: String,
@@ -11,13 +7,12 @@ const blogSchema = new mongoose.Schema({
   likes: Number,
 });
 
-mongoose
-  .connect(mongoUrl)
-  .then(() => {
-    console.log("connected to MongoDB");
-  })
-  .catch((error) => {
-    console.log("error connecting to MongoDB:", error.message);
-  });
+blogSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject._v;
+  },
+});
 
 module.exports = mongoose.model("Blog", blogSchema);
