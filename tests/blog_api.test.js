@@ -65,6 +65,17 @@ test("a new blog post with missing likes can be added and set default to 0", asy
   expect(titles).toContain("Other Blog Post");
 });
 
+test.only("a new blog post without title or url will raise a bad request status code", async () => {
+  const newBlogPost = {
+    author: "Carlos H",
+    likes: 12,
+  };
+  await api.post("/api/blogs").send(newBlogPost).expect(400);
+
+  const blogsAtEnd = await api.get("/api/blogs");
+  expect(blogsAtEnd.body).toHaveLength(4);
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
