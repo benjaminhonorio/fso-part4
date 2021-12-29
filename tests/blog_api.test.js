@@ -22,7 +22,7 @@ test("the unique identifier of the blog post is named id", async () => {
   expect(blog.id).toBeDefined();
 });
 
-test.only("a valid new blog post can be added", async () => {
+test("a valid new blog post can be added", async () => {
   const newBlogPost = {
     title: "New Blog Post",
     author: "Benjamin H",
@@ -41,6 +41,28 @@ test.only("a valid new blog post can be added", async () => {
   const titles = blogsAtEnd.body.map((b) => b.title);
 
   expect(titles).toContain("New Blog Post");
+});
+
+test("a new blog post with missing likes can be added and set default to 0", async () => {
+  const newBlogPost = {
+    title: "Other Blog Post",
+    author: "Carlos H",
+    url: "http://example2.com",
+  };
+  await api
+    .post("/api/blogs")
+    .send(newBlogPost)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const blogsAtEnd = await api.get("/api/blogs");
+  expect(blogsAtEnd.body).toHaveLength(4);
+
+  const likesArray = blogsAtEnd.body.map((b) => b.likes);
+  expect(likesArray).toContain(0);
+
+  const titles = blogsAtEnd.body.map((b) => b.title);
+  expect(titles).toContain("Other Blog Post");
 });
 
 afterAll(() => {
