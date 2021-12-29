@@ -16,6 +16,12 @@ test("there are to blogs in the list", async () => {
   expect(response.body).toHaveLength(2);
 }, 100000);
 
+test.only("the unique identifier of the blog post is named id", async () => {
+  const response = await api.get("/api/blogs");
+  const blog = response.body[0];
+  expect(blog.id).toBeDefined();
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
