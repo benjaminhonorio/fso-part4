@@ -13,13 +13,7 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.post("/", async (request, response) => {
-  let token = request.get("authorization");
-
-  if (token && token.toLowerCase().startsWith("bearer ")) {
-    token = token.substring(7);
-  } else {
-    return response.status(401).json({ error: "missing or invalid token" });
-  }
+  const { token } = req;
   const { id } = jwt.verify(token, process.env.SECRET);
   if (id) {
     const user = await User.findById(id);
