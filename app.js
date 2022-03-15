@@ -26,10 +26,10 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
 app.use(tokenExtractor);
 app.use("/api/blogs", userExtractor, blogsRouter);
-app.use("/api/users", usersRouter);
 app.use(errorHandler);
 
 module.exports = app;
