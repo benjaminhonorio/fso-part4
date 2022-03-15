@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 const config = require("./config");
 
 const errorHandler = (error, request, response, next) => {
@@ -22,4 +23,15 @@ const tokenExtractor = (request, response, next) => {
   next();
 };
 
-module.exports = { errorHandler, tokenExtractor };
+const userExtractor = async (request, response, next) => {
+  const { id } = request.token;
+  if (id) {
+    const user = await User.findById(id);
+    request.user = user;
+    next();
+  } else {
+    response.status(404).json({ error: "user not found" });
+  }
+};
+
+module.exports = { errorHandler, tokenExtractor, userExtractor };
