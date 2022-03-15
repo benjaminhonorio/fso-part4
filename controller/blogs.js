@@ -2,6 +2,7 @@ const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const config = require("../utils/config");
 
 blogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("author", {
@@ -13,8 +14,8 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.post("/", async (request, response) => {
-  const { token } = req;
-  const { id } = jwt.verify(token, process.env.SECRET);
+  const { token } = request;
+  const { id } = token;
   if (id) {
     const user = await User.findById(id);
     const blog = Blog({ ...request.body, author: user._id });
@@ -31,8 +32,21 @@ blogsRouter.post("/", async (request, response) => {
 });
 
 blogsRouter.delete("/:id", async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id);
-  response.status(204).end();
+  const { token } = request;
+  console.log(token);
+  const { id } = jwt.verify(token, config.SECRET);
+  if (id) {
+    const user = await User.findById(id);
+    console.log(user._id, id);
+    if (user._id === id) {
+      await Blog.findByIdAndRemove(request.params.id);
+      return response.status(204).end();
+    } else {
+      return response.status(401).json({ error: "user not allowed" });
+    }
+  } else {
+    response.status(401).json({ error: "missing or invalid token" });
+  }
 });
 
 blogsRouter.put("/:id", async (request, response) => {
