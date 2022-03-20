@@ -6,11 +6,7 @@ const config = require('./utils/config')
 const blogsRouter = require('./controller/blogs')
 const usersRouter = require('./controller/users')
 const loginRouter = require('./controller/login')
-const {
-  errorHandler,
-  tokenExtractor,
-  userExtractor,
-} = require('./utils/middleware')
+const { errorHandler } = require('./utils/middleware')
 const logger = require('./utils/logger')
 const app = express()
 
@@ -29,6 +25,12 @@ app.use(express.json())
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/blogs', blogsRouter)
+
+if (process.env.NODE_ENV === 'test') {
+  app.use('/api/testing', require('./controller/testing'))
+  logger.info('running in test mode for cypress')
+}
+
 app.use(errorHandler)
 
 module.exports = app
